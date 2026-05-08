@@ -1,4 +1,4 @@
-const socket = io("YOUR_RENDER_URL");
+const socket = io("https://my-backend-2241.onrender.com");
 
 const chat = document.getElementById("chat");
 const status = document.getElementById("status");
