@@ -49,3 +49,37 @@ function nextUser() {
   chat.innerHTML = "";
   status.innerText = "Waiting for partner...";
 }
+
+let mediaRecorder;
+let audioChunks = [];
+
+// START RECORDING
+async function startRecording() {
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+  mediaRecorder = new MediaRecorder(stream);
+
+  mediaRecorder.ondataavailable = (e) => {
+    audioChunks.push(e.data);
+  };
+
+  mediaRecorder.onstop = () => {
+    const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+    audioChunks = [];
+
+    const reader = new FileReader();
+    reader.readAsDataURL(audioBlob);
+
+    reader.onloadend = () => {
+      const base64Audio = reader.result;
+      socket.emit("audio", base64Audio);
+    };
+  };
+
+  mediaRecorder.start();
+}
+
+// STOP RECORDING
+function stopRecording() {
+  mediaRecorder.stop();
+}
